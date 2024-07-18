@@ -1,0 +1,15 @@
+[package]
+name = "cint"
+authors = ["chinder"]
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/rust-lang/cargo/"
+license = "GPL-2.0"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[build-dependencies]
+cmake = "0.1"
+bindgen = "0.65.1"
