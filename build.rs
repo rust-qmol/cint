@@ -2,8 +2,14 @@ use cmake::Config;
 use std::process::Command;
 
 fn main() {
-
-    Command::new("git").args(&["clone", "https://github.com/sunqm/libcint.git"]).status().unwrap();
+    Command::new("git")
+        .args(&["submodule", "init"])
+        .status()
+        .expect("git submodule init failed");
+    Command::new("git")
+        .args(&["submodule", "update"])
+        .status()
+        .expect("git submodule update faild");
 
     let dst = Config::new("libcint").build();
 
@@ -23,8 +29,8 @@ fn main() {
             CINTOpt const *opt, double cache[]);
         
         ")
-        .header("cint.h")
-        .header("cint_funcs.h")
+        .header(format!("{}/include/cint.h", dst.display()))
+        .header(format!("{}/include/cint_funcs.h", dst.display()))
         .allowlist_function("int.*")
         .allowlist_function(".*_optimizer")
         .allowlist_function("cint2e.*")
@@ -40,7 +46,6 @@ fn main() {
         .layout_tests(false)
         .generate()
         .expect("Unable to generate bindings");
-
 
     let out_path = std::env::current_dir().unwrap();
     bindings

@@ -223,7 +223,10 @@ impl CintDate {
 
         //
         Self {
-            atom_groups: atom_groups.iter().map(|atom| CintAtomGroup::from_other_group(atom)).collect(),
+            atom_groups: atom_groups
+                .iter()
+                .map(|atom| CintAtomGroup::from_other_group(atom))
+                .collect(),
             basis_template,
             atmbas_index,
             atm,
