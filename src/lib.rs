@@ -8,7 +8,7 @@ mod tests {
 
     #[test]
     fn test_rawdata() {
-        use crate::cint::{cdata::CintDate, libccint::int1e_ovlp_cart};
+        use crate::cint::{cdata::CintDate, libcint::int1e_ovlp_cart};
         use std::collections::BTreeMap;
 
         //

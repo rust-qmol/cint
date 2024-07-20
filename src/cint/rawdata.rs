@@ -1,4 +1,4 @@
-use super::{cdata::CintBasis, libccint::CINTgto_norm};
+use super::{cdata::CintBasis, libcint::CINTgto_norm};
 
 #[derive(Debug, Clone)]
 pub struct CGTO {

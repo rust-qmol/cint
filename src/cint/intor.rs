@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use super::{
     cdata::{CintAtom, CintBasis, CintEnv},
-    libccint::{CINTIntegralFunction, CINTcgtos_cart, CINTcgtos_spheric, CINTcgtos_spinor},
+    libcint::{CINTIntegralFunction, CINTcgtos_cart, CINTcgtos_spheric, CINTcgtos_spinor},
     NAtom,
 };
 
