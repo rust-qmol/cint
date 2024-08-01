@@ -1,4 +1,45 @@
+use core::{io::{bse::{ElectronShells, Elements}, PERIODIC_TABLE}, num::convert::aa2au};
+use std::collections::BTreeMap;
+
+use crate::cint::NAtom;
+
 use super::{cdata::CintBasis, libcint::CINTgto_norm};
+
+pub trait GetCGTO {
+    type OutPut;
+    fn to_cgto(&self, kappa_of: i8, norm: bool) -> Self::OutPut;
+}
+
+impl GetCGTO for ElectronShells {
+    type OutPut = CGTO;
+    fn to_cgto(&self, kappa_of: i8, norm: bool) -> Self::OutPut {
+        let cgto = CGTO {
+            kappa_of,
+            angl: self.angular_momentum().clone(),
+            exp: self.exponents().iter().map(|x| x.parse().unwrap()).collect(),
+            coeff: self
+                .coefficients()
+                .iter()
+                .map(|y| y.iter().map(|x| x.parse().unwrap()).collect())
+                .collect(),
+        };
+        if norm {
+            cgto.norm()
+        } else {
+            cgto
+        }
+    }
+}
+
+impl GetCGTO for Elements {
+    type OutPut = Vec<CGTO>;
+    fn to_cgto(&self, kappa_of: i8, norm: bool) -> Self::OutPut {
+        self.electron_shells()
+            .iter()
+            .map(|eshl| eshl.to_cgto(kappa_of, norm))
+            .collect()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct CGTO {
@@ -78,6 +119,69 @@ impl CintAtomGroup {
             coordinates: atom_group.coordinates().clone(),
         }
     }
+
+    pub fn from_xyz(xyz_str: &str, basis: Option<BTreeMap<u8, Vec<CGTO>>>) -> Vec<Self> {
+        let mut natm: NAtom = 0;
+        let xyz_list: Vec<&str> = xyz_str.trim_end().lines().collect();
+        match xyz_list[0].parse() {
+            Err(why) => panic!("{:?}", why),
+            Ok(v) => natm = v,
+        }
+
+        let mut atoms_map: BTreeMap<u8, Vec<[f64; 3]>> = BTreeMap::new();
+
+        let mut counter = 0;
+        xyz_list[2..xyz_list.len()].iter().for_each(|line| {
+            let mut split_s = line.trim().split_whitespace();
+            let nuc = match split_s.next() {
+                Some(symbol) => match PERIODIC_TABLE.iter().position(|ele| *ele == symbol) {
+                    None => panic!(""),
+                    Some(nuc) => (nuc + 1) as u8,
+                },
+                None => panic!(""),
+            };
+
+            let mut coor = [0.0; 3];
+            for (i, x_str) in split_s.enumerate() {
+                match x_str.parse() {
+                    Ok(x) => coor[i] = aa2au(x),
+                    Err(why) => panic!(""),
+                }
+            }
+
+            match atoms_map.get_mut(&nuc) {
+                Some(atom_coors) => atom_coors.push(coor),
+                None => {
+                    atoms_map.insert(nuc, vec![coor]);
+                    ()
+                }
+            }
+
+            counter += 1;
+        });
+        assert_eq!(natm, counter);
+
+        atoms_map
+            .iter()
+            .map(|(nuc, coors)| {
+                Self::new(
+                    match &basis {
+                        Some(bas) => match bas.get(&nuc) {
+                            Some(b) => Some(b.to_vec()),
+                            None => panic!(""),
+                        },
+                        None => None,
+                    },
+                    *nuc,
+                    0,
+                    0.0,
+                    0.0,
+                    coors.to_vec(),
+                )
+            })
+            .collect()
+    }
+
 }
 
 impl AtomGroup for CintAtomGroup {

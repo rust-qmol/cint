@@ -1,7 +1,5 @@
 #[allow(unused)]
 pub mod cint;
-#[allow(unused)]
-pub mod io;
 
 #[cfg(test)]
 mod tests {

@@ -1,6 +1,6 @@
+use core::io::bse::JsonBasis;
 use std::{collections::BTreeMap, fs};
 
-use crate::io::basis::json::JsonBasis;
 
 use super::{
     intor::Intor,
@@ -8,7 +8,7 @@ use super::{
         ANG_MAX, NGRIDS, PTR_COMMON_ORIG, PTR_ENV_START, PTR_EXPCUTOFF, PTR_F12_ZETA, PTR_GRIDS,
         PTR_GTG_ZETA, PTR_RANGE_OMEGA, PTR_RINV_ORIG, PTR_RINV_ZETA,
     },
-    rawdata::{AtomGroup, CintAtomGroup},
+    rawdata::{AtomGroup, CintAtomGroup, GetCGTO},
     AtomIndex, BasisIndex, NAtom,
 };
 
